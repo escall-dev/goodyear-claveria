@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
+import { useDarkMode } from '../hooks/useDarkMode'
+import { useLocation } from 'react-router-dom'
 
 export default function Suppliers() {
+  const location = useLocation()
+  const { isDarkMode, cardClass, inputClass, labelClass, textClass, mutedTextClass } = useDarkMode()
   const [suppliers, setSuppliers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -18,11 +22,11 @@ export default function Suppliers() {
     notes: '',
   })
 
-  useEffect(() => {
-    fetchSuppliers()
-  }, [])
-
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
+    // Only show loading spinner if we don't have data yet
+    if (suppliers.length === 0) {
+      setLoading(true)
+    }
     try {
       const { data, error } = await supabase
         .from('suppliers')
@@ -37,7 +41,12 @@ export default function Suppliers() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [suppliers.length])
+
+  useEffect(() => {
+    // Fetch data when component mounts or when navigating to this route
+    fetchSuppliers()
+  }, [location.pathname, fetchSuppliers]) // Refetch when route changes
 
   const openModal = (supplier = null) => {
     if (supplier) {
@@ -130,8 +139,8 @@ export default function Suppliers() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Suppliers Management</h2>
-          <p className="text-gray-600">Manage your supplier relationships</p>
+          <h2 className={`text-2xl font-bold ${textClass}`}>Suppliers Management</h2>
+          <p className={mutedTextClass}>Manage your supplier relationships</p>
         </div>
         <button onClick={() => openModal()} className="btn btn-primary">
           ➕ Add New Supplier
@@ -139,20 +148,20 @@ export default function Suppliers() {
       </div>
 
       {/* Search */}
-      <div className="card">
+      <div className={cardClass}>
         <input
           type="text"
           placeholder="Search suppliers..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="input"
+          className={inputClass}
         />
       </div>
 
       {/* Suppliers Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredSuppliers.map((supplier) => (
-          <div key={supplier.id} className="card hover:shadow-lg transition-shadow">
+          <div key={supplier.id} className={`${cardClass} hover:shadow-lg transition-shadow`}>
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-gray-900">{supplier.name}</h3>

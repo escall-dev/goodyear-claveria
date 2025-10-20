@@ -1,11 +1,13 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/authStore'
 import toast from 'react-hot-toast'
 import { useReactToPrint } from 'react-to-print'
 import Barcode from 'react-barcode'
+import { useLocation } from 'react-router-dom'
 
 export default function POS() {
+  const location = useLocation()
   const { user } = useAuthStore()
   const [products, setProducts] = useState([])
   const [cart, setCart] = useState([])
@@ -18,11 +20,11 @@ export default function POS() {
   const receiptRef = useRef()
   const barcodeInputRef = useRef()
 
-  useEffect(() => {
-    fetchProducts()
-  }, [])
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
+    // Only show loading spinner if we don't have data yet
+    if (products.length === 0) {
+      setLoading(true)
+    }
     try {
       const { data, error } = await supabase
         .from('products')
@@ -35,8 +37,15 @@ export default function POS() {
     } catch (error) {
       console.error('Error fetching products:', error)
       toast.error('Failed to fetch products')
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [products.length])
+
+  useEffect(() => {
+    // Fetch data when component mounts or when navigating to this route
+    fetchProducts()
+  }, [location.pathname, fetchProducts]) // Refetch when route changes
 
   const handleBarcodeSubmit = (e) => {
     e.preventDefault()

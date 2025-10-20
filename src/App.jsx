@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast'
 import { useEffect } from 'react'
 import { useAuthStore } from './stores/authStore'
+import { useThemeStore } from './stores/themeStore'
 
 // Layouts
 import MainLayout from './layouts/MainLayout'
@@ -25,10 +26,20 @@ import Loading from './components/Loading'
 
 function App() {
   const { user, loading, initialize } = useAuthStore()
+  const { isDarkMode } = useThemeStore()
 
   useEffect(() => {
     initialize()
   }, [initialize])
+
+  // Apply dark mode class to body
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+    }
+  }, [isDarkMode])
 
   if (loading) {
     return <Loading />

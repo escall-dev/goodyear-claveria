@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
+import { useDarkMode } from '../hooks/useDarkMode'
+import { useLocation } from 'react-router-dom'
 
 export default function BackOrders() {
+  const location = useLocation()
+  const { isDarkMode, cardClass, inputClass, labelClass, textClass, mutedTextClass } = useDarkMode()
   const [backOrders, setBackOrders] = useState([])
   const [products, setProducts] = useState([])
   const [suppliers, setSuppliers] = useState([])
-  const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingOrder, setEditingOrder] = useState(null)
   const [filterStatus, setFilterStatus] = useState('all')
@@ -20,8 +23,9 @@ export default function BackOrders() {
   })
 
   useEffect(() => {
+    // Fetch data when component mounts or when navigating to this route
     fetchData()
-  }, [])
+  }, [location.pathname]) // Refetch when route changes
 
   const fetchData = async () => {
     try {
@@ -44,8 +48,6 @@ export default function BackOrders() {
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error('Failed to fetch data')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -181,14 +183,6 @@ export default function BackOrders() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -287,15 +281,13 @@ export default function BackOrders() {
                       >
                         ✏️
                       </button>
-                      {order.status === 'pending' && (
-                        <button
-                          onClick={() => handleDelete(order.id)}
-                          className="text-red-600 hover:text-red-800"
-                          title="Delete"
-                        >
-                          🗑️
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleDelete(order.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Delete"
+                      >
+                        🗑️
+                      </button>
                     </div>
                   </td>
                 </tr>

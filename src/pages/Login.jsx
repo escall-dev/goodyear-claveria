@@ -33,18 +33,22 @@ export default function Login() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="bg-white rounded-2xl shadow-2xl p-8">
+      <div className="rounded-[2rem] shadow-2xl p-10" style={{ backgroundColor: '#172169' }}>
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="text-6xl mb-4">🛞</div>
-          <h1 className="text-3xl font-bold text-gray-900">Goodyear POS</h1>
-          <p className="text-gray-600 mt-2">Tires & Inventory System</p>
+          <img 
+            src="/images/goodyear-logo-nobg.png" 
+            alt="Goodyear Logo" 
+            className="h-32 w-auto object-contain mx-auto mb-6"
+          />
+          <h1 className="text-3xl font-bold text-white">POS System</h1>
+          <p className="text-gray-300 mt-2">Tires & Inventory Management</p>
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="label">
+            <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
               Email Address
             </label>
             <input
@@ -54,14 +58,14 @@ export default function Login() {
               required
               value={formData.email}
               onChange={handleChange}
-              className="input"
+              className="input bg-white"
               placeholder="Enter your email"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="label">
+            <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
               Password
             </label>
             <input
@@ -71,7 +75,7 @@ export default function Login() {
               required
               value={formData.password}
               onChange={handleChange}
-              className="input"
+              className="input bg-white"
               placeholder="Enter your password"
               disabled={loading}
             />
@@ -80,16 +84,17 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn btn-primary py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 text-lg font-semibold text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            style={{ backgroundColor: '#F9A825' }}
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
         {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-600 text-center">
-            <strong>Demo:</strong> admin@goodyear.com / admin123
+        <div className="mt-6 p-4 bg-white bg-opacity-10 rounded-lg border border-white border-opacity-20">
+          <p className="text-xs text-white text-center">
+            <strong>Account:</strong> escall.dev027.com / goodyear
           </p>
         </div>
       </div>

@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
+import { useDarkMode } from '../hooks/useDarkMode'
+import { useLocation } from 'react-router-dom'
 
 export default function Users() {
+  const location = useLocation()
+  const { isDarkMode, cardClass, inputClass, labelClass, textClass, mutedTextClass } = useDarkMode()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -15,11 +19,11 @@ export default function Users() {
     role: 'cashier',
   })
 
-  useEffect(() => {
-    fetchUsers()
-  }, [])
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
+    // Only show loading spinner if we don't have data yet
+    if (users.length === 0) {
+      setLoading(true)
+    }
     try {
       const { data, error } = await supabase
         .from('users')
@@ -34,7 +38,12 @@ export default function Users() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [users.length])
+
+  useEffect(() => {
+    // Fetch data when component mounts or when navigating to this route
+    fetchUsers()
+  }, [location.pathname, fetchUsers]) // Refetch when route changes
 
   const openModal = (user = null) => {
     if (user) {

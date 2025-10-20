@@ -1,19 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useDarkMode } from '../hooks/useDarkMode'
+import { useLocation } from 'react-router-dom'
 
 export default function Reports() {
+  const location = useLocation()
+  const { isDarkMode, cardClass, textClass, mutedTextClass } = useDarkMode()
   const [stats, setStats] = useState({})
   const [loading, setLoading] = useState(true)
   const [salesByCategory, setSalesByCategory] = useState([])
   const [monthlySales, setMonthlySales] = useState([])
   const [topProducts, setTopProducts] = useState([])
 
-  useEffect(() => {
-    fetchReportsData()
-  }, [])
-
-  const fetchReportsData = async () => {
+  const fetchReportsData = useCallback(async () => {
+    // Only show loading spinner if we don't have data yet
+    if (topProducts.length === 0) {
+      setLoading(true)
+    }
     try {
       // Overall stats
       const [
@@ -79,7 +83,12 @@ export default function Reports() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [topProducts.length])
+
+  useEffect(() => {
+    // Fetch data when component mounts or when navigating to this route
+    fetchReportsData()
+  }, [location.pathname, fetchReportsData]) // Refetch when route changes
 
   const COLORS = ['#f0a500', '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8']
 
