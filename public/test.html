@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Connection Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .test-result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Supabase Connection Tester</h1>
+        <p>This tool will help diagnose your Supabase connection issues.</p>
+        
+        <div id="results"></div>
+        
+        <button onclick="runTests()">Run All Tests</button>
+        <button onclick="location.reload()">Refresh</button>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+        const SUPABASE_URL = 'https://dhgejovdxgkppgiacltu.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZ2Vqb3ZkeGdrcHBnaWFjbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NjE4NzIsImV4cCI6MjA3NjUzNzg3Mn0.E0FKgEe_KkpV14FIUkdQvpxSBw7v58rzIXLshpDzVxA'
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        window.runTests = async function() {
+            const resultsDiv = document.getElementById('results')
+            resultsDiv.innerHTML = '<h2>Running Tests...</h2>'
+
+            let html = ''
+
+            // Test 1: Check Supabase Connection
+            html += '<div class="test-result info"><h3>Test 1: Supabase Connection</h3>'
+            try {
+                const { data, error } = await supabase.from('suppliers').select('count')
+                if (error) throw error
+                html += '<p class="success">✅ Connection successful!</p>'
+            } catch (error) {
+                html += `<p class="error">❌ Connection failed: ${error.message}</p>`
+            }
+            html += '</div>'
+
+            // Test 2: Check Authentication Status
+            html += '<div class="test-result info"><h3>Test 2: Authentication Status</h3>'
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session) {
+                html += `<p class="success">✅ User is logged in</p>`
+                html += `<pre>User ID: ${session.user.id}\nEmail: ${session.user.email}</pre>`
+            } else {
+                html += '<p class="error">❌ No user logged in</p>'
+                html += '<p><strong>This is likely your problem!</strong> You need to create and login with a user.</p>'
+            }
+            html += '</div>'
+
+            // Test 3: Check if user exists in users table
+            if (session) {
+                html += '<div class="test-result info"><h3>Test 3: User in Database</h3>'
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single()
+                    
+                    if (error) throw error
+                    if (data) {
+                        html += '<p class="success">✅ User exists in database</p>'
+                        html += `<pre>${JSON.stringify(data, null, 2)}</pre>`
+                    }
+                } catch (error) {
+                    html += `<p class="error">❌ User NOT in database: ${error.message}</p>`
+                    html += '<p><strong>Solution:</strong> Run this SQL in Supabase:</p>'
+                    html += `<pre>INSERT INTO users (id, email, full_name, role)
+VALUES (
+  '${session.user.id}',
+  '${session.user.email}',
+  'Admin User',
+  'admin'
+);</pre>`
+                }
+                html += '</div>'
+            }
+
+            // Test 4: Try to fetch suppliers
+            html += '<div class="test-result info"><h3>Test 4: Fetch Suppliers</h3>'
+            try {
+                const { data, error } = await supabase
+                    .from('suppliers')
+                    .select('*')
+                
+                if (error) throw error
+                html += `<p class="success">✅ Successfully fetched ${data.length} suppliers</p>`
+                html += `<pre>${JSON.stringify(data, null, 2)}</pre>`
+            } catch (error) {
+                html += `<p class="error">❌ Failed to fetch suppliers: ${error.message}</p>`
+                if (error.message.includes('row-level security')) {
+                    html += '<p><strong>This is an RLS (Row Level Security) issue.</strong></p>'
+                    html += '<p>You need to:</p>'
+                    html += '<ol>'
+                    html += '<li>Create a user in Supabase Auth</li>'
+                    html += '<li>Login with that user</li>'
+                    html += '<li>Add that user to the users table with a role</li>'
+                    html += '</ol>'
+                }
+            }
+            html += '</div>'
+
+            // Test 5: Check if tables exist
+            html += '<div class="test-result info"><h3>Test 5: Check Tables</h3>'
+            const tables = ['users', 'suppliers', 'products', 'back_orders', 'sales', 'sale_items', 'activity_logs']
+            let allTablesExist = true
+            for (const table of tables) {
+                try {
+                    const { error } = await supabase.from(table).select('count').limit(0)
+                    if (error && error.message.includes('does not exist')) {
+                        html += `<p class="error">❌ Table "${table}" does not exist</p>`
+                        allTablesExist = false
+                    } else {
+                        html += `<p class="success">✅ Table "${table}" exists</p>`
+                    }
+                } catch (error) {
+                    html += `<p class="error">❌ Error checking "${table}": ${error.message}</p>`
+                }
+            }
+            if (allTablesExist) {
+                html += '<p class="success"><strong>✅ All tables exist!</strong></p>'
+            } else {
+                html += '<p class="error"><strong>You need to run the database schema SQL!</strong></p>'
+            }
+            html += '</div>'
+
+            // Summary
+            html += '<div class="test-result info"><h3>📋 Summary & Next Steps</h3>'
+            if (!session) {
+                html += '<h4 style="color: #dc3545;">🚨 Main Issue: Not Logged In</h4>'
+                html += '<ol>'
+                html += '<li>Go to: <a href="https://supabase.com/dashboard/project/dhgejovdxgkppgiacltu/auth/users" target="_blank">Supabase Auth Users</a></li>'
+                html += '<li>Click "Add User" → "Create new user"</li>'
+                html += '<li>Enter email and password</li>'
+                html += '<li>Check "Auto Confirm User"</li>'
+                html += '<li>Click "Create User"</li>'
+                html += '<li>Copy the User ID</li>'
+                html += '<li>Go to <a href="https://supabase.com/dashboard/project/dhgejovdxgkppgiacltu/sql/new" target="_blank">SQL Editor</a></li>'
+                html += '<li>Run the INSERT SQL shown in Test 3 above</li>'
+                html += '<li>Login to your app with those credentials</li>'
+                html += '<li>Run this test again</li>'
+                html += '</ol>'
+            } else {
+                html += '<p class="success">✅ You are logged in and ready to use the app!</p>'
+            }
+            html += '</div>'
+
+            resultsDiv.innerHTML = html
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            window.runTests()
+        })
+    </script>
+</body>
+</html>

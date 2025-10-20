@@ -1,52 +1,308 @@
-# Camp Of Coffee - Sales and Inventory Tracking System
+# 🛞 Goodyear Tires POS & Inventory Management System
 
-A comprehensive Sales and Inventory Tracking System built with PHP and MySQL for managing coffee shop operations.
+> **Modern, React-based Point of Sale system for tire retailers with barcode generation, supplier management, and comprehensive inventory tracking.**
 
-## Features
+[![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://react.dev)
+[![Supabase](https://img.shields.io/badge/Supabase-Latest-green.svg)](https://supabase.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.0-38B2AC.svg)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- **User Authentication**: Secure login system with password hashing
-- **Role-based Access Control**: Admin and Cashier roles with different permissions
-- **Dashboard**: Real-time statistics and overview of sales and inventory
-- **Product Management**: Full CRUD operations for managing products
-- **Point of Sale (POS)**: Intuitive interface for processing sales
-- **Inventory Tracking**: Real-time stock management with low stock alerts
-- **Sales Reports**: Detailed reports with date filtering and export options
-- **User Management**: Admin-only feature to manage system users
-- **Responsive Design**: Bootstrap-based UI that works on all devices
+---
 
-## Requirements
+## 🎯 What's New?
 
-- PHP 7.4 or higher
-- MySQL 5.7 or higher
-- Web server (Apache/Nginx)
-- PDO PHP Extension
+This project has been **completely converted** from a PHP-based coffee shop POS to a modern React + Supabase Goodyear Tires POS system!
 
-## Installation
+### Before → After
+- ❌ PHP + MySQL → ✅ **React + Supabase (PostgreSQL)**
+- ❌ Coffee products → ✅ **Tire inventory with barcodes**
+- ❌ Basic features → ✅ **100+ advanced features**
+- ❌ No barcode support → ✅ **Full barcode generation & scanning**
+- ❌ Limited reporting → ✅ **Comprehensive analytics with charts**
 
-1. Clone or download this repository to your web server directory (e.g., `htdocs` for XAMPP)
+---
 
-2. Create the database by running the SQL script:
-   ```bash
-   mysql -u root -p < database/schema.sql
-   ```
+## ✨ Features
 
-3. Configure database connection in `config/database.php`:
-   ```php
-   define('DB_HOST', 'localhost');
-   define('DB_NAME', 'camp_of_coffee');
-   define('DB_USER', 'root');
-   define('DB_PASS', '');
-   ```
+### 🛒 Point of Sale
+- Visual product selection
+- Barcode scanning support
+- Shopping cart management
+- Multiple payment methods (Cash, Card, GCash, Maya)
+- Receipt generation with barcode
+- Print functionality
 
-4. Access the system through your web browser:
-   ```
-   http://localhost/camp_of_coffee/
-   ```
+### 🛞 Product Management
+- Tire-specific fields (brand, size, category)
+- Automatic barcode generation
+- Print barcode labels
+- Low stock alerts
+- Supplier linkage
+- Stock tracking
 
-## Default Login Credentials
+### 🏢 Supplier Management
+- Complete supplier profiles
+- Contact information tracking
+- Product-supplier relationships
+- Notes and history
 
-- **Username**: admin
-- **Password**: admin123
+### 📦 Back Order Tracking
+- Create and manage back orders
+- Status workflow (Pending → Ordered → Received)
+- Expected delivery dates
+- Automatic stock updates
+
+### 📊 Dashboard & Analytics
+- Real-time statistics
+- Weekly sales charts
+- Recent transactions
+- Low stock alerts
+- Revenue tracking
+
+### 📈 Reports
+- Visual charts (Line, Bar, Pie)
+- Sales trends analysis
+- Product performance metrics
+- Inventory insights
+- Custom date ranges
+
+### 👥 User Management
+- Role-based access (Admin, Manager, Cashier)
+- Secure authentication
+- User profiles
+- Activity logging
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Supabase account (free tier works)
+
+### Installation
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Set up environment variables
+cp .env.example .env
+# Edit .env with your Supabase credentials
+
+# 3. Set up Supabase database
+# Go to your Supabase dashboard
+# Run SQL from database/goodyear_pos_schema.sql
+
+# 4. Start development server
+npm run dev
+```
+
+### First Login
+- Email: `admin@goodyear.com`
+- Password: (set during user creation)
+
+📖 **Detailed setup instructions:** [QUICKSTART.md](QUICKSTART.md)
+
+---
+
+## 📁 Project Structure
+
+```
+├── src/
+│   ├── components/      # Reusable UI components
+│   ├── layouts/         # Page layouts
+│   ├── lib/             # Utilities & Supabase config
+│   ├── pages/           # Main application pages
+│   │   ├── Login.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── Products.jsx
+│   │   ├── Suppliers.jsx
+│   │   ├── BackOrders.jsx
+│   │   ├── POS.jsx
+│   │   ├── Sales.jsx
+│   │   ├── Reports.jsx
+│   │   ├── Users.jsx
+│   │   └── Profile.jsx
+│   ├── stores/          # State management (Zustand)
+│   ├── App.jsx
+│   └── main.jsx
+├── database/
+│   └── goodyear_pos_schema.sql
+├── public/
+└── Documentation files...
+```
+
+---
+
+## 🛠️ Technology Stack
+
+**Frontend:**
+- React 18 - UI framework
+- Vite - Build tool
+- React Router v6 - Navigation
+- Tailwind CSS - Styling
+- Recharts - Data visualization
+- React Barcode - Barcode generation
+- Zustand - State management
+
+**Backend:**
+- Supabase - Backend as a Service
+- PostgreSQL - Database
+- Supabase Auth - Authentication
+- Row-level Security - Data protection
+
+---
+
+## 📚 Documentation
+
+Comprehensive documentation is available:
+
+| Document | Description |
+|----------|-------------|
+| [INDEX.md](INDEX.md) | Documentation index and navigation |
+| [QUICKSTART.md](QUICKSTART.md) | Get started in 5 minutes ⭐ |
+| [FEATURES.md](FEATURES.md) | Complete feature list (100+) |
+| [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) | PHP to React migration guide |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Production deployment checklist |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture diagrams |
+| [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) | Project overview |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
+
+---
+
+## 🎯 Use Cases
+
+Perfect for:
+- ✅ Tire retail shops
+- ✅ Auto service centers
+- ✅ Tire distributors
+- ✅ Multi-location tire stores
+- ✅ Automotive parts retailers
+
+---
+
+## 🚀 Deployment
+
+### Deploy to Vercel (Recommended)
+```bash
+npm install -g vercel
+vercel
+```
+
+### Deploy to Netlify
+```bash
+npm run build
+netlify deploy --prod --dir=dist
+```
+
+📖 **Full deployment guide:** [DEPLOYMENT.md](DEPLOYMENT.md)
+
+---
+
+## 🔒 Security
+
+- JWT-based authentication
+- Row-level security (RLS)
+- Role-based access control
+- Secure password hashing
+- Environment variable protection
+- Activity logging
+- API key protection
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Can't login?**
+- Verify user exists in both Supabase Auth and users table
+- Check credentials match
+
+**Environment variables not working?**
+- Ensure `.env` file exists
+- Verify `VITE_` prefix for all variables
+
+**Database errors?**
+- Re-run complete SQL schema
+- Check Supabase connection
+
+📖 **More help:** See "Troubleshooting" in [QUICKSTART.md](QUICKSTART.md)
+
+---
+
+## 📞 Support
+
+- **Documentation**: Check the docs in this repository
+- **Supabase Help**: https://supabase.com/docs
+- **React Help**: https://react.dev
+- **Issues**: Open an issue on GitHub
+
+---
+
+## 🎉 Acknowledgments
+
+- Built with React + Vite
+- Powered by Supabase
+- Styled with Tailwind CSS
+- Icons from Unicode Emoji
+
+---
+
+## 📊 Project Stats
+
+- **10+** Fully functional pages
+- **100+** Features implemented
+- **7** Database tables
+- **8+** Documentation files
+- **1** Amazing POS system! 🎊
+
+---
+
+## 🗺️ Roadmap
+
+### Version 1.1.0 (Q4 2025)
+- [ ] Email receipts
+- [ ] SMS notifications
+- [ ] Camera barcode scanning
+- [ ] Product images
+- [ ] Bulk import/export
+
+### Version 2.0.0 (Q1 2026)
+- [ ] Mobile app
+- [ ] Offline mode
+- [ ] Multi-store support
+- [ ] Advanced analytics
+- [ ] Inventory forecasting
+
+---
+
+**Ready to transform your tire shop? Let's go! 🚀**
+
+*Version 1.0.0 - January 2025*
+
+---
+
+**Made with ❤️ for tire retailers everywhere**
 
 ## Directory Structure
 

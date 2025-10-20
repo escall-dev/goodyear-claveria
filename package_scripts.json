@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "setup": "echo '🚀 Setting up Goodyear POS...' && npm install && echo '✅ Dependencies installed!' && echo '📝 Please configure your .env file with Supabase credentials' && echo '📖 See README_NEW.md for detailed setup instructions'"
+  }
+}

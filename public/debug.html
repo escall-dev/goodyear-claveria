@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Auth Check</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+        .box { background: #f0f0f0; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        pre { background: white; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Auth & Database Check</h1>
+    <div id="output">Loading...</div>
+    
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+        
+        const supabase = createClient(
+            'https://dhgejovdxgkppgiacltu.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZ2Vqb3ZkeGdrcHBnaWFjbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NjE4NzIsImV4cCI6MjA3NjUzNzg3Mn0.E0FKgEe_KkpV14FIUkdQvpxSBw7v58rzIXLshpDzVxA'
+        )
+        
+        async function runChecks() {
+            let html = ''
+            
+            // Check 1: Auth Session
+            const { data: { session } } = await supabase.auth.getSession()
+            html += '<div class="box ' + (session ? 'success' : 'error') + '">'
+            html += '<h2>1. Authentication Status</h2>'
+            if (session) {
+                html += '<p>✅ <strong>Logged In</strong></p>'
+                html += '<pre>User ID: ' + session.user.id + '\nEmail: ' + session.user.email + '</pre>'
+            } else {
+                html += '<p>❌ <strong>NOT Logged In</strong></p>'
+                html += '<p>You need to login first! Go to your app and login.</p>'
+            }
+            html += '</div>'
+            
+            if (session) {
+                // Check 2: User in Database
+                html += '<div class="box">'
+                html += '<h2>2. User in Database</h2>'
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single()
+                    
+                    if (error) throw error
+                    
+                    html += '<div class="success">'
+                    html += '<p>✅ <strong>User exists in database</strong></p>'
+                    html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>'
+                    html += '</div>'
+                } catch (error) {
+                    html += '<div class="error">'
+                    html += '<p>❌ <strong>User NOT in database</strong></p>'
+                    html += '<p>Error: ' + error.message + '</p>'
+                    html += '<p><strong>FIX: Run this SQL in Supabase:</strong></p>'
+                    html += '<pre>INSERT INTO users (id, email, full_name, role)\nVALUES (\n  \'' + session.user.id + '\',\n  \'' + session.user.email + '\',\n  \'Admin User\',\n  \'admin\'\n);</pre>'
+                    html += '<button onclick="copySQL()">Copy SQL</button>'
+                    html += '</div>'
+                    
+                    window.fixSQL = `INSERT INTO users (id, email, full_name, role) VALUES ('${session.user.id}', '${session.user.email}', 'Admin User', 'admin');`
+                }
+                html += '</div>'
+                
+                // Check 3: Fetch Suppliers (Test RLS)
+                html += '<div class="box">'
+                html += '<h2>3. Test Data Fetch (Suppliers)</h2>'
+                try {
+                    const { data, error } = await supabase
+                        .from('suppliers')
+                        .select('*')
+                    
+                    if (error) throw error
+                    
+                    html += '<div class="success">'
+                    html += '<p>✅ <strong>Successfully fetched ' + data.length + ' suppliers</strong></p>'
+                    html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>'
+                    html += '</div>'
+                } catch (error) {
+                    html += '<div class="error">'
+                    html += '<p>❌ <strong>Cannot fetch suppliers</strong></p>'
+                    html += '<p>Error: ' + error.message + '</p>'
+                    
+                    if (error.message.includes('policy')) {
+                        html += '<h3>This is an RLS Policy Issue!</h3>'
+                        html += '<p>Your user is logged in but the Row Level Security policies are blocking access.</p>'
+                        html += '<p><strong>Most likely cause:</strong> User is not in the users table with proper role.</p>'
+                    }
+                    html += '</div>'
+                }
+                html += '</div>'
+                
+                // Check 4: Test Products
+                html += '<div class="box">'
+                html += '<h2>4. Test Data Fetch (Products)</h2>'
+                try {
+                    const { data, error } = await supabase
+                        .from('products')
+                        .select('*')
+                    
+                    if (error) throw error
+                    
+                    html += '<div class="success">'
+                    html += '<p>✅ <strong>Successfully fetched ' + data.length + ' products</strong></p>'
+                    html += '<pre>' + JSON.stringify(data.slice(0, 2), null, 2) + '\n... and ' + (data.length - 2) + ' more</pre>'
+                    html += '</div>'
+                } catch (error) {
+                    html += '<div class="error">'
+                    html += '<p>❌ <strong>Cannot fetch products</strong></p>'
+                    html += '<p>Error: ' + error.message + '</p>'
+                    html += '</div>'
+                }
+                html += '</div>'
+            }
+            
+            // Solution
+            html += '<div class="box">'
+            html += '<h2>🎯 Quick Fix</h2>'
+            if (!session) {
+                html += '<p>1. Go to your app: <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></p>'
+                html += '<p>2. Login with your credentials</p>'
+                html += '<p>3. Come back here and refresh this page</p>'
+            } else {
+                html += '<p><strong>Open SQL Editor:</strong> <a href="https://supabase.com/dashboard/project/dhgejovdxgkppgiacltu/sql/new" target="_blank">Supabase SQL Editor</a></p>'
+                html += '<p>If you see errors above, run the SQL fix provided.</p>'
+            }
+            html += '</div>'
+            
+            document.getElementById('output').innerHTML = html
+        }
+        
+        window.copySQL = function() {
+            navigator.clipboard.writeText(window.fixSQL)
+            alert('SQL copied to clipboard!')
+        }
+        
+        runChecks()
+    </script>
+</body>
+</html>
