@@ -8,7 +8,7 @@ export default function Suppliers() {
   const location = useLocation()
   const { isDarkMode, cardClass, inputClass, labelClass, textClass, mutedTextClass } = useDarkMode()
   const [suppliers, setSuppliers] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -23,11 +23,8 @@ export default function Suppliers() {
   })
 
   const fetchSuppliers = useCallback(async () => {
-    // Only show loading spinner if we don't have data yet
-    if (suppliers.length === 0) {
-      setLoading(true)
-    }
     try {
+      setLoading(true)
       const { data, error } = await supabase
         .from('suppliers')
         .select('*')
@@ -41,7 +38,7 @@ export default function Suppliers() {
     } finally {
       setLoading(false)
     }
-  }, [suppliers.length])
+  }, [])
 
   useEffect(() => {
     // Fetch data when component mounts or when navigating to this route

@@ -94,7 +94,7 @@ export default function Login() {
         {/* Demo Credentials */}
         <div className="mt-6 p-4 bg-white bg-opacity-10 rounded-lg border border-white border-opacity-20">
           <p className="text-xs text-white text-center">
-            <strong>Account:</strong> escall.dev027.com / goodyear
+            <strong>Account:</strong> goodyear@gmail.com / goodyear
           </p>
         </div>
       </div>

@@ -21,11 +21,8 @@ export default function POS() {
   const barcodeInputRef = useRef()
 
   const fetchProducts = useCallback(async () => {
-    // Only show loading spinner if we don't have data yet
-    if (products.length === 0) {
-      setLoading(true)
-    }
     try {
+      setLoading(true)
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -40,7 +37,7 @@ export default function POS() {
     } finally {
       setLoading(false)
     }
-  }, [products.length])
+  }, [])
 
   useEffect(() => {
     // Fetch data when component mounts or when navigating to this route
@@ -235,7 +232,22 @@ export default function POS() {
                 onClick={() => addToCart(product)}
                 className="card p-4 hover:shadow-lg transition-shadow text-left"
               >
-                <div className="text-2xl mb-2">🛞</div>
+                {/* Tire Icon SVG */}
+                <div className="w-12 h-12 mb-2 text-yellow-500">
+                  <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                    <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                    <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" strokeWidth="1.5"/>
+                    <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" strokeWidth="1.5"/>
+                    <line x1="2" y1="12" x2="6" y2="12" stroke="currentColor" strokeWidth="1.5"/>
+                    <line x1="18" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="1.5"/>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" stroke="currentColor" strokeWidth="1.5"/>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" stroke="currentColor" strokeWidth="1.5"/>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" stroke="currentColor" strokeWidth="1.5"/>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" stroke="currentColor" strokeWidth="1.5"/>
+                  </svg>
+                </div>
                 <h4 className="font-semibold text-sm mb-1 line-clamp-2">{product.name}</h4>
                 <p className="text-xs text-gray-600 mb-2">{product.size}</p>
                 <p className="text-primary-600 font-bold">₱{parseFloat(product.price).toLocaleString()}</p>
